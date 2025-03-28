@@ -34,7 +34,7 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyFloat('time_down_85', 0);
         $this->RegisterPropertyFloat('time_down_100', 0);
         $this->RegisterPropertyFloat('time_full_move_extra', 0);
-        $this->RegisterPropertyFloat('time_start_delay', 0); // aktuell nicht in verwendeung
+        //$this->RegisterPropertyFloat('time_start_delay', 0); // aktuell nicht in verwendeung
         $this->RegisterPropertyFloat('calibration_duration', 6.0);
         $this->RegisterPropertyBoolean('auto_save_calibration', false);
 
@@ -314,10 +314,11 @@ class xcomfortshutter extends IPSModule
             $this->SendDebug(__FUNCTION__, "Added $extraFullTime sec for full open/close", 0);
         }
 
-        // Trägheitszeit beim Losfahren
+/*        // Trägheitszeit beim Losfahren //aktuell nicht in Verwendung
         $startDelay = $this->ReadPropertyFloat('time_start_delay');
         $driveTime += $startDelay;
         $this->SendDebug(__FUNCTION__, "Added $startDelay sec start delay", 0);
+*/
         if ($driveTime <= 0) {
             $this->SendDebug(__FUNCTION__, "Calculated drive time is 0. No movement.", 0);
             return;
