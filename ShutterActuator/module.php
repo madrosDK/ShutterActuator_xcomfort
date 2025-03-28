@@ -412,9 +412,10 @@ class xcomfortshutter extends IPSModule
        }
 
        $factor = $duration / $distance;
-       $time_50  = $factor * (50 - $start);
-       $time_85  = $factor * (85 - $start);
-       $time_100 = $factor * (100 - $start);
+       // → hochgerechnet ab 0 % (Vollfahrt!)
+       $time_50  = $factor * 50;
+       $time_85  = $factor * 85;
+       $time_100 = $factor * 100;
 
     if ($this->ReadPropertyBoolean('auto_save_calibration')) {
           IPS_SetProperty($this->InstanceID, 'time_down_50', round($time_50, 2));
@@ -470,9 +471,10 @@ class xcomfortshutter extends IPSModule
        }
 
        $factor = $duration / $distance;
-       $time_85 = $factor * ($start - 85);
-       $time_50 = $factor * ($start - 50);
-       $time_0  = $factor * ($start - 0);
+       // → hochgerechnet ab 100 % (Vollfahrt!)
+       $time_0  = $factor * 100;
+       $time_50 = $factor * (100 - 50);
+       $time_85 = $factor * (100 - 85);
 
     if ($this->ReadPropertyBoolean('auto_save_calibration')) {
        IPS_SetProperty($this->InstanceID, 'time_up_85', round($time_85, 2));
