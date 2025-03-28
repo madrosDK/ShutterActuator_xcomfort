@@ -294,13 +294,13 @@ class xcomfortshutter extends IPSModule
 
         // 🔁 Spezialfall: Ziel ist 0 % oder 100 %
         if ((int)$targetPosition === 0) {
-            $this->SendDebug(__FUNCTION__, "Ziel ist 0 % – Shutter fährt komplett runter (nur Down-Befehl)", 0);
+            $this->SendDebug(__FUNCTION__, "Ziel ist 0 % – Shutter fährt komplett hoch (nur Up-Befehl)", 0);
             $this->Up();
             return;
         }
 
         if ((int)$targetPosition === 100) {
-            $this->SendDebug(__FUNCTION__, "Ziel ist 100 % – Shutter fährt komplett hoch (nur Up-Befehl)", 0);
+            $this->SendDebug(__FUNCTION__, "Ziel ist 100 % – Shutter fährt komplett runter (nur Down-Befehl)", 0);
             $this->Down();
             return;
         }
