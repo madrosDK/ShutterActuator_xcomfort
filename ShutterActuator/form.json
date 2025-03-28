@@ -123,22 +123,6 @@
                 }
             ]
         },
-        {
-          "type": "ExpansionPanel",
-          "caption": "calibration",
-          "items": [
-            {
-              "type": "NumberSpinner",
-              "name": "calibration_duration",
-              "caption": "calibration time (sec)",
-              "digits": 1,
-              "suffix": "s",
-              "default": 6,
-              "save": true
-            }
-          ]
-        },
-
             {
               "type": "CheckBox",
               "name": "auto_save_calibration",

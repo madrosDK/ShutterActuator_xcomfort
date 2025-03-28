@@ -33,7 +33,7 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyFloat('time_down_50', 0);
         $this->RegisterPropertyFloat('time_down_85', 0);
         $this->RegisterPropertyFloat('time_down_100', 0);
-        $this->RegisterPropertyFloat('time_full_move_extra', 0);
+        //$this->RegisterPropertyFloat('time_full_move_extra', 0); //aktuell nicht in Verwendung
         //$this->RegisterPropertyFloat('time_start_delay', 0); // aktuell nicht in verwendeung
         $this->RegisterPropertyFloat('calibration_duration', 6.0);
         $this->RegisterPropertyBoolean('auto_save_calibration', false);
@@ -292,6 +292,18 @@ class xcomfortshutter extends IPSModule
 
         $directionDown = $currentPosition < $targetPosition;
 
+        // 🔁 Spezialfall: Ziel ist 0 % oder 100 %
+        if ((int)$targetPosition === 0) {
+            $this->SendDebug(__FUNCTION__, "Ziel ist 0 % – Shutter fährt komplett runter (nur Down-Befehl)", 0);
+            $this->Down();
+            return;
+        }
+
+        if ((int)$targetPosition === 100) {
+            $this->SendDebug(__FUNCTION__, "Ziel ist 100 % – Shutter fährt komplett hoch (nur Up-Befehl)", 0);
+            $this->Up();
+            return;
+        }
         $times = $directionDown ? [
             0   => 0,
             50  => $this->ReadPropertyFloat('time_down_50'),
@@ -306,13 +318,6 @@ class xcomfortshutter extends IPSModule
 
         // Zeit berechnen
         $driveTime = $this->calculateDriveTime($currentPosition, $targetPosition, $times);
-
-        // Zusätzliche Zeit beim vollen Öffnen/Schließen
-        if (in_array((int)$targetPosition, [0, 100])) {
-            $extraFullTime = $this->ReadPropertyFloat('time_full_move_extra');
-            $driveTime += $extraFullTime;
-            $this->SendDebug(__FUNCTION__, "Added $extraFullTime sec for full open/close", 0);
-        }
 
 /*        // Trägheitszeit beim Losfahren //aktuell nicht in Verwendung
         $startDelay = $this->ReadPropertyFloat('time_start_delay');
