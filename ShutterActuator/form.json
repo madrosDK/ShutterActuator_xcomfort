@@ -113,14 +113,6 @@
                     "items": [
                       {
                         "type": "NumberSpinner",
-                        "name": "time_start_delay",
-                        "caption": "delay on start (sec)",
-                        "digits": 1,
-                        "suffix": "sec",
-                        "width": "300px"
-                      },
-                      {
-                        "type": "NumberSpinner",
                         "name": "time_full_move_extra",
                         "caption": "additional time for full close / open (sec)",
                         "digits": 1,
@@ -196,11 +188,6 @@
                   "type": "Button",
                   "caption": "calibration - raise shutters",
                   "onClick": "TSA_CalibrateUp($id);"
-                },
-                {
-                  "type": "Button",
-                  "caption": "calibration - delay",
-                  "onClick": "TSA_Calibratedelay($id);"
                 }
             ]
         },
