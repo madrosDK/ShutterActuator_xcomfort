@@ -253,6 +253,9 @@ class xcomfortshutter extends IPSModule
      {
          $vid = $this->ReadPropertyInteger('TransmitterVariable');
 
+         $posMiddle = $this->ReadPropertyInteger('position_middle');
+         $posBottom = $this->ReadPropertyInteger('position_bottom');
+
          if ($vid != 0) {
              $this->SendDebug(__FUNCTION__, 'Requested symbolic position: ' . $value . '%');
 
@@ -293,9 +296,6 @@ class xcomfortshutter extends IPSModule
         }
 
         $directionDown = $currentPosition < $targetPosition;
-
-        $posMiddle = $this->ReadPropertyInteger('position_middle');
-        $posBottom = $this->ReadPropertyInteger('position_bottom');
 
         $times = $directionDown ? [
             0   => 0,
