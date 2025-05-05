@@ -37,6 +37,8 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyFloat('time_start_delay', 0);
         $this->RegisterPropertyFloat('calibration_duration', 6.0);
         $this->RegisterPropertyBoolean('auto_save_calibration', false);
+        $this->RegisterPropertyInteger('position_middle', 50);
+        $this->RegisterPropertyInteger('position_bottom', 85);
 
     }
 
@@ -260,10 +262,10 @@ class xcomfortshutter extends IPSModule
                      $realPosition = 0;
                      break;
                  case 26:
-                     $realPosition = 50;
+                     $realPosition = $posMiddle;
                      break;
                  case 76:
-                     $realPosition = 85;
+                     $realPosition = $posBottom;
                      break;
                  case 91:
                      $realPosition = 100;
@@ -291,6 +293,9 @@ class xcomfortshutter extends IPSModule
         }
 
         $directionDown = $currentPosition < $targetPosition;
+
+        $posMiddle = $this->ReadPropertyInteger('position_middle');
+        $posBottom = $this->ReadPropertyInteger('position_bottom');
 
         $times = $directionDown ? [
             0   => 0,
