@@ -33,10 +33,12 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyFloat('time_down_50', 0);
         $this->RegisterPropertyFloat('time_down_85', 0);
         $this->RegisterPropertyFloat('time_down_100', 0);
-        //$this->RegisterPropertyFloat('time_full_move_extra', 0); //aktuell nicht in Verwendung
-        //$this->RegisterPropertyFloat('time_start_delay', 0); // aktuell nicht in verwendeung
+        $this->RegisterPropertyFloat('time_full_move_extra', 0);
+        $this->RegisterPropertyFloat('time_start_delay', 0);
         $this->RegisterPropertyFloat('calibration_duration', 6.0);
         $this->RegisterPropertyBoolean('auto_save_calibration', false);
+        $this->RegisterPropertyInteger('position_middle', 50);
+        $this->RegisterPropertyInteger('position_bottom', 85);
 
     }
 
@@ -178,7 +180,7 @@ class xcomfortshutter extends IPSModule
         $vid = $this->ReadPropertyInteger('TransmitterVariable');
         if ($vid != 0) {
             $this->SendDebug(__FUNCTION__, 'Raise shutter!');
-            @RequestAction($vid, 0);
+            RequestAction($vid, 0);
         } else {
             $this->SendDebug(__FUNCTION__, 'Variable to control the shutter not set!');
         }
@@ -195,7 +197,7 @@ class xcomfortshutter extends IPSModule
         $vid = $this->ReadPropertyInteger('TransmitterVariable');
         if ($vid != 0) {
             $this->SendDebug(__FUNCTION__, 'Lower shutter!');
-            @RequestAction($vid, 4);
+            RequestAction($vid, 4);
         } else {
             $this->SendDebug(__FUNCTION__, 'Variable to control the shutter not set!');
         }
@@ -214,7 +216,7 @@ class xcomfortshutter extends IPSModule
              $pid = IPS_GetParent($vid);
              $this->SendDebug(__FUNCTION__, 'Shutter stopped!');
              //HM_WriteValueBoolean($pid, 'STOP', true);
-             @RequestAction($vid, 2); // XComfort Stop-Befehl
+             RequestAction($vid, 2); // XComfort Stop-Befehl
              //RequestAction($vid, true);
          } else {
              $this->SendDebug(__FUNCTION__, 'VVariable to control the shutter not set!');
@@ -260,10 +262,10 @@ class xcomfortshutter extends IPSModule
                      $realPosition = 0;
                      break;
                  case 26:
-                     $realPosition = 50;
+                     $realPosition = $posMiddle;
                      break;
                  case 76:
-                     $realPosition = 85;
+                     $realPosition = $posBottom;
                      break;
                  case 91:
                      $realPosition = 100;
@@ -292,18 +294,9 @@ class xcomfortshutter extends IPSModule
 
         $directionDown = $currentPosition < $targetPosition;
 
-        // 🔁 Spezialfall: Ziel ist 0 % oder 100 %
-        if ((int)$targetPosition === 0) {
-            $this->SendDebug(__FUNCTION__, "Ziel ist 0 % – Shutter fährt komplett hoch (nur Up-Befehl)", 0);
-            $this->Up();
-            return;
-        }
+        $posMiddle = $this->ReadPropertyInteger('position_middle');
+        $posBottom = $this->ReadPropertyInteger('position_bottom');
 
-        if ((int)$targetPosition === 100) {
-            $this->SendDebug(__FUNCTION__, "Ziel ist 100 % – Shutter fährt komplett runter (nur Down-Befehl)", 0);
-            $this->Down();
-            return;
-        }
         $times = $directionDown ? [
             0   => 0,
             50  => $this->ReadPropertyFloat('time_down_50'),
@@ -319,11 +312,17 @@ class xcomfortshutter extends IPSModule
         // Zeit berechnen
         $driveTime = $this->calculateDriveTime($currentPosition, $targetPosition, $times);
 
-/*        // Trägheitszeit beim Losfahren //aktuell nicht in Verwendung
+        // Zusätzliche Zeit beim vollen Öffnen/Schließen
+        if (in_array((int)$targetPosition, [0, 100])) {
+            $extraFullTime = $this->ReadPropertyFloat('time_full_move_extra');
+            $driveTime += $extraFullTime;
+            $this->SendDebug(__FUNCTION__, "Added $extraFullTime sec for full open/close", 0);
+        }
+
+        // Trägheitszeit beim Losfahren
         $startDelay = $this->ReadPropertyFloat('time_start_delay');
         $driveTime += $startDelay;
         $this->SendDebug(__FUNCTION__, "Added $startDelay sec start delay", 0);
-*/
         if ($driveTime <= 0) {
             $this->SendDebug(__FUNCTION__, "Calculated drive time is 0. No movement.", 0);
             return;
@@ -412,10 +411,9 @@ class xcomfortshutter extends IPSModule
        }
 
        $factor = $duration / $distance;
-       // → hochgerechnet ab 0 % (Vollfahrt!)
-       $time_50  = $factor * 50;
-       $time_85  = $factor * 85;
-       $time_100 = $factor * 100;
+       $time_50  = $factor * (50 - $start);
+       $time_85  = $factor * (85 - $start);
+       $time_100 = $factor * (100 - $start);
 
     if ($this->ReadPropertyBoolean('auto_save_calibration')) {
           IPS_SetProperty($this->InstanceID, 'time_down_50', round($time_50, 2));
@@ -471,10 +469,9 @@ class xcomfortshutter extends IPSModule
        }
 
        $factor = $duration / $distance;
-       // → hochgerechnet ab 100 % (Vollfahrt!)
-       $time_0  = $factor * 100;
-       $time_50 = $factor * (100 - 50);
-       $time_85 = $factor * (100 - 85);
+       $time_85 = $factor * ($start - 85);
+       $time_50 = $factor * ($start - 50);
+       $time_0  = $factor * ($start - 0);
 
     if ($this->ReadPropertyBoolean('auto_save_calibration')) {
        IPS_SetProperty($this->InstanceID, 'time_up_85', round($time_85, 2));
@@ -494,5 +491,66 @@ class xcomfortshutter extends IPSModule
        echo "100 → 0%  = " . round($time_0, 2) . " s\n";
      }
    }
+       public function Calibratedelay()
+    {
+       $duration = $this->ReadPropertyFloat('calibration_duration');
+       $halfDuration = $duration / 2;
 
+       $this->SendDebug(__FUNCTION__, "Starte Trägheitsanalyse: Runterfahrt", 0);
+
+       // Fahrt 1: Volle Dauer
+       $this->Up();
+       IPS_Sleep(($duration + 2) * 1000);
+       $this->Stop();
+       IPS_Sleep(2000);
+       $start1 = floatval($this->Level());
+       $this->Down();
+       IPS_Sleep($duration * 1000);
+       $this->Stop();
+       IPS_Sleep(2000);
+       $end1 = floatval($this->Level());
+
+       $dist1 = $end1 - $start1;
+       $rate1 = $dist1 / $duration;
+
+       // Fahrt 2: Halbe Dauer
+       $this->Up();
+       IPS_Sleep(($duration + 2) * 1000);
+       $this->Stop();
+       IPS_Sleep(2000);
+       $start2 = floatval($this->Level());
+       $this->Down();
+       IPS_Sleep($halfDuration * 1000);
+       $this->Stop();
+       IPS_Sleep(2000);
+       $end2 = floatval($this->Level());
+
+       $dist2 = $end2 - $start2;
+       $rate2 = $dist2 / $halfDuration;
+
+       if ($dist1 < 1 || $dist2 < 1) {
+           echo "❌ Bewegung zu gering – Trägheitsmessung nicht möglich.\n";
+           return;
+       }
+
+       // Erwartete Strecke bei halber Zeit (hochgerechnet aus voller Fahrt)
+       $expectedDist = $rate1 * $halfDuration;
+       $missingDist = $expectedDist - $dist2;
+
+       // Berechne, wie lange der Motor bei voller Rate für die fehlende Strecke gebraucht hätte
+       $delay = ($missingDist / $rate1) / 2;
+       $delay = round($delay, 2);
+
+       echo "✅ Trägheitsanalyse abgeschlossen (Runterfahrt):\n";
+       echo "→ Volle Fahrt:     {$dist1}% in {$duration}s → {$rate1} %/s\n";
+       echo "→ Halbe Fahrt:     {$dist2}% in {$halfDuration}s → {$rate2} %/s\n";
+       echo "→ Erwartet bei 5s: {$expectedDist}% → Abweichung: {$missingDist}%\n";
+       echo "→ Startverzögerung: {$delay} Sekunden\n";
+
+       if ($this->ReadPropertyBoolean('auto_save_calibration')) {
+           IPS_SetProperty($this->InstanceID, 'time_start_delay', $delay);
+           IPS_ApplyChanges($this->InstanceID);
+           echo "→ Startverzögerung automatisch gespeichert in 'Trägheit beim Start'.\n";
+       }
+    }
 }

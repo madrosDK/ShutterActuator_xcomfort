@@ -46,6 +46,32 @@
             "type": "ExpansionPanel",
             "caption": "Zeiten ...",
             "items": [
+                                "items": [
+                      {
+                        "type": "RowLayout",
+                        "items": [
+                          {
+                            "type": "NumberSpinner",
+                            "name": "position_middle",
+                            "caption": "Position Mitte:",
+                            "suffix": "%",
+                            "minimum": 0,
+                            "maximum": 100,
+                            "step": 1,
+                            "width": "300px"
+                          },
+                          {
+                            "type": "NumberSpinner",
+                            "name": "position_bottom",
+                            "caption": "Position Unten:",
+                            "suffix": "%",
+                            "minimum": 0,
+                            "maximum": 100,
+                            "step": 1,
+                            "width": "300px"
+                          }
+                        ]
+                      },
                 {
                     "type": "Label",
                     "caption": "Please measure the running time for the respective position and enter the corresponding values or start the automatic calibration!"
@@ -106,6 +132,27 @@
                           "suffix": "sec",
                           "width": "300px"
                         }
+                    ]
+                },
+                {
+                    "type": "RowLayout",
+                    "items": [
+                      {
+                        "type": "NumberSpinner",
+                        "name": "time_start_delay",
+                        "caption": "delay on start (sec)",
+                        "digits": 1,
+                        "suffix": "sec",
+                        "width": "300px"
+                      },
+                      {
+                        "type": "NumberSpinner",
+                        "name": "time_full_move_extra",
+                        "caption": "additional time for full close / open (sec)",
+                        "digits": 1,
+                        "suffix": "sec",
+                        "width": "300px"
+                      }
                     ]
                 }
             ]
@@ -175,6 +222,11 @@
                   "type": "Button",
                   "caption": "calibration - raise shutters",
                   "onClick": "TSA_CalibrateUp($id);"
+                },
+                {
+                  "type": "Button",
+                  "caption": "calibration - delay",
+                  "onClick": "TSA_Calibratedelay($id);"
                 }
             ]
         },
