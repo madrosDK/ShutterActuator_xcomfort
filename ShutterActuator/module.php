@@ -97,7 +97,7 @@ class xcomfortshutter extends IPSModule
          $profile = [
              [0, 'offen', '', -1],
              [26, 'Mitte', '', -1],
-             [76, 'unten', '', -1],
+             [71, 'unten', '', -1],
              [91, 'geschlossen', '', -1],
          ];
          $this->RegisterProfileInteger('xcomfort.ShutterActuator', 'Jalousie', '', '', 0, 100, 0, $profile);
