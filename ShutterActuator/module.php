@@ -304,17 +304,17 @@ class xcomfortshutter extends IPSModule
          if ($vid != 0) {
              $this->SendDebug(__FUNCTION__, 'Angeforderte Position: ' . $value . '%');
 
-             if ($value >= $middleMin && $value <= $middleMax) {
+             if ($value < $middleMin) {
+                 $this->SendDebug(__FUNCTION__, "Wert < middle_min ($middleMin), fahre ganz hoch (0%)");
+                 $value = 0;
+             } elseif ($value >= $middleMin && $value <= $middleMax) {
                  $this->SendDebug(__FUNCTION__, "Wert im Bereich middle ($middleMin–$middleMax), setze auf $posMiddle%");
                  $value = $posMiddle;
              } elseif ($value >= $bottomMin && $value <= $bottomMax) {
                  $this->SendDebug(__FUNCTION__, "Wert im Bereich bottom ($bottomMin–$bottomMax), setze auf $posBottom%");
                  $value = $posBottom;
-             } elseif ($value < $middleMin) {
-                 $this->SendDebug(__FUNCTION__, "Wert unter bottom_min ($bottomMin), fahre ganz hoch (0%)");
-                 $value = 0;
              } elseif ($value > $bottomMax) {
-                 $this->SendDebug(__FUNCTION__, "Wert über bottom_max ($bottomMax), fahre ganz runter (100%)");
+                 $this->SendDebug(__FUNCTION__, "Wert > bottom_max ($bottomMax), fahre ganz runter (100%)");
                  $value = 100;
              }
 
