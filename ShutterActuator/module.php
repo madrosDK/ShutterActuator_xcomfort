@@ -39,6 +39,10 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyBoolean('auto_save_calibration', false);
         $this->RegisterPropertyInteger('position_middle', 50);
         $this->RegisterPropertyInteger('position_bottom', 85);
+        $this->RegisterPropertyInteger('middle_min', 10);
+        $this->RegisterPropertyInteger('middle_max', 64);
+        $this->RegisterPropertyInteger('bottom_min', 65);
+        $this->RegisterPropertyInteger('bottom_max', 90);
 
     }
 
