@@ -41,10 +41,6 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyInteger('position_bottom', 85);
 
     }
-        private $middle_min = 10;
-        private $middle_max = 64;
-        private $bottom_min = 65;
-        private $bottom_max = 90;
 
     /**
      * Overrides the internal IPSModule::Destroy($id) function
@@ -296,10 +292,10 @@ class xcomfortshutter extends IPSModule
          $posBottom = $this->ReadPropertyInteger('position_bottom');
 
          // Bereichsgrenzen laden
-         $middleMin = $this->ReadPropertyInteger('middle_min');
-         $middleMax = $this->ReadPropertyInteger('middle_max');
-         $bottomMin = $this->ReadPropertyInteger('bottom_min');
-         $bottomMax = $this->ReadPropertyInteger('bottom_max');
+         $middleMin = $this->ReadPropertyInteger('middle_min',10);
+         $middleMax = $this->ReadPropertyInteger('middle_max',64);
+         $bottomMin = $this->ReadPropertyInteger('bottom_min',65);
+         $bottomMax = $this->ReadPropertyInteger('bottom_max',90);
 
          if ($vid != 0) {
              $this->SendDebug(__FUNCTION__, 'Angeforderte Position: ' . $value . '%');
