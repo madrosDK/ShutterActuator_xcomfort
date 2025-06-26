@@ -39,6 +39,10 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyBoolean('auto_save_calibration', false);
         $this->RegisterPropertyInteger('position_middle', 50);
         $this->RegisterPropertyInteger('position_bottom', 85);
+        $this->RegisterPropertyInteger('middle_min', 40);
+        $this->RegisterPropertyInteger('middle_max', 60);
+        $this->RegisterPropertyInteger('bottom_min', 65);
+        $this->RegisterPropertyInteger('bottom_max', 88);
 
     }
 
@@ -249,7 +253,7 @@ class xcomfortshutter extends IPSModule
      *
      * TSA_Position($id, $position);
      */
-     public function Position(int $value)
+     /* public function Position(int $value)
      {
          $vid = $this->ReadPropertyInteger('TransmitterVariable');
 
@@ -280,6 +284,37 @@ class xcomfortshutter extends IPSModule
 
              $this->SendDebug(__FUNCTION__, 'Mapped to real position: ' . $realPosition . '%');
              $this->MoveShutter($realPosition);
+         } else {
+             $this->SendDebug(__FUNCTION__, 'TransmitterVariable not set!');
+         }
+     } */
+     public function Position(int $value)
+     {
+         $vid = $this->ReadPropertyInteger('TransmitterVariable');
+
+         $posMiddle = $this->ReadPropertyInteger('position_middle');
+         $posBottom = $this->ReadPropertyInteger('position_bottom');
+
+         // Einlesbare Schwellenwerte
+         $middleMin = $this->ReadPropertyInteger('middle_min');
+         $middleMax = $this->ReadPropertyInteger('middle_max');
+         $bottomMin = $this->ReadPropertyInteger('bottom_min');
+         $bottomMax = $this->ReadPropertyInteger('bottom_max');
+
+         if ($vid != 0) {
+             $this->SendDebug(__FUNCTION__, 'Original angeforderte Position: ' . $value . '%');
+
+             // Bereichsprüfung → Ersetze durch symbolische Position
+             if ($value >= $middleMin && $value <= $middleMax) {
+                 $this->SendDebug(__FUNCTION__, "Wert im Bereich middle ($middleMin–$middleMax), setze auf $posMiddle%");
+                 $value = $posMiddle;
+             } elseif ($value >= $bottomMin && $value <= $bottomMax) {
+                 $this->SendDebug(__FUNCTION__, "Wert im Bereich bottom ($bottomMin–$bottomMax), setze auf $posBottom%");
+                 $value = $posBottom;
+             }
+
+             $this->SendDebug(__FUNCTION__, 'Mapped to real position: ' . $value . '%');
+             $this->MoveShutter($value);
          } else {
              $this->SendDebug(__FUNCTION__, 'TransmitterVariable not set!');
          }
