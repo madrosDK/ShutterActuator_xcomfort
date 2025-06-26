@@ -310,7 +310,7 @@ class xcomfortshutter extends IPSModule
              } elseif ($value >= $bottomMin && $value <= $bottomMax) {
                  $this->SendDebug(__FUNCTION__, "Wert im Bereich bottom ($bottomMin–$bottomMax), setze auf $posBottom%");
                  $value = $posBottom;
-             } elseif ($value < $bottomMin) {
+             } elseif ($value < $middleMin) {
                  $this->SendDebug(__FUNCTION__, "Wert unter bottom_min ($bottomMin), fahre ganz hoch (0%)");
                  $value = 0;
              } elseif ($value > $bottomMax) {
