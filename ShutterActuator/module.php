@@ -40,7 +40,7 @@ class xcomfortshutter extends IPSModule
         $this->RegisterPropertyInteger('position_middle', 50);
         $this->RegisterPropertyInteger('position_bottom', 85);
         $this->RegisterPropertyInteger('middle_min', 10);
-        $this->RegisterPropertyInteger('middle_max', 60);
+        $this->RegisterPropertyInteger('middle_max', 64);
         $this->RegisterPropertyInteger('bottom_min', 65);
         $this->RegisterPropertyInteger('bottom_max', 90);
 
@@ -295,30 +295,36 @@ class xcomfortshutter extends IPSModule
          $posMiddle = $this->ReadPropertyInteger('position_middle');
          $posBottom = $this->ReadPropertyInteger('position_bottom');
 
-         // Einlesbare Schwellenwerte
+         // Bereichsgrenzen laden
          $middleMin = $this->ReadPropertyInteger('middle_min');
          $middleMax = $this->ReadPropertyInteger('middle_max');
          $bottomMin = $this->ReadPropertyInteger('bottom_min');
          $bottomMax = $this->ReadPropertyInteger('bottom_max');
 
          if ($vid != 0) {
-             $this->SendDebug(__FUNCTION__, 'Original angeforderte Position: ' . $value . '%');
+             $this->SendDebug(__FUNCTION__, 'Angeforderte Position: ' . $value . '%');
 
-             // Bereichsprüfung → Ersetze durch symbolische Position
              if ($value >= $middleMin && $value <= $middleMax) {
                  $this->SendDebug(__FUNCTION__, "Wert im Bereich middle ($middleMin–$middleMax), setze auf $posMiddle%");
                  $value = $posMiddle;
              } elseif ($value >= $bottomMin && $value <= $bottomMax) {
                  $this->SendDebug(__FUNCTION__, "Wert im Bereich bottom ($bottomMin–$bottomMax), setze auf $posBottom%");
                  $value = $posBottom;
+             } elseif ($value < $bottomMin) {
+                 $this->SendDebug(__FUNCTION__, "Wert unter bottom_min ($bottomMin), fahre ganz hoch (0%)");
+                 $value = 0;
+             } elseif ($value > $bottomMax) {
+                 $this->SendDebug(__FUNCTION__, "Wert über bottom_max ($bottomMax), fahre ganz runter (100%)");
+                 $value = 100;
              }
 
-             $this->SendDebug(__FUNCTION__, 'Mapped to real position: ' . $value . '%');
+             $this->SendDebug(__FUNCTION__, 'Mapped Position: ' . $value . '%');
              $this->MoveShutter($value);
          } else {
              $this->SendDebug(__FUNCTION__, 'TransmitterVariable not set!');
          }
      }
+
 
 
     public function MoveShutter(float $targetPosition)
