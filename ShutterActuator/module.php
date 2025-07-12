@@ -304,14 +304,6 @@ class xcomfortshutter extends IPSModule
          if ($vid != 0) {
              $this->SendDebug(__FUNCTION__, 'Angeforderte Position: ' . $value . '%');
 
-
-             $middleMin  = $this->ReadPropertyInteger('MiddleMin');
-             $middleMax  = $this->ReadPropertyInteger('MiddleMax');
-             $bottomMin  = $this->ReadPropertyInteger('BottomMin');
-             $bottomMax  = $this->ReadPropertyInteger('BottomMax');
-             $posMiddle  = $this->ReadPropertyInteger('PosMiddle');
-             $posBottom  = $this->ReadPropertyInteger('PosBottom');
-             
              if ($value < $middleMin) {
                  $this->SendDebug(__FUNCTION__, "Wert < middle_min ($middleMin), fahre ganz hoch (0%)");
                  $value = 0;
