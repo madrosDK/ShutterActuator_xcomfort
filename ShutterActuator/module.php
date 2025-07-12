@@ -303,6 +303,7 @@ class xcomfortshutter extends IPSModule
 
          if ($vid != 0) {
              $this->SendDebug(__FUNCTION__, 'Angeforderte Position: ' . $value . '%');
+
              if ($value <= 0) {
                  $this->SendDebug(__FUNCTION__, 'Wert ist 0%, fahre hoch mit Up()');
                  $this->Up();
@@ -335,7 +336,8 @@ class xcomfortshutter extends IPSModule
          } else {
              $this->SendDebug(__FUNCTION__, 'TransmitterVariable not set!');
          }
-         
+      }
+
   /*           if ($value < $middleMin) {
                  $this->SendDebug(__FUNCTION__, "Wert < middle_min ($middleMin), fahre ganz hoch (0%)");
                  $value = 0;
