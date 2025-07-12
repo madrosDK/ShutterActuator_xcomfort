@@ -303,7 +303,19 @@ class xcomfortshutter extends IPSModule
 
          if ($vid != 0) {
              $this->SendDebug(__FUNCTION__, 'Angeforderte Position: ' . $value . '%');
+             if ($value <= 0) {
+                 $this->SendDebug(__FUNCTION__, 'Wert ist 0%, fahre hoch mit Up()');
+                 $this->Up();
+                 return;
+             }
 
+             if ($value >= 100) {
+                 $this->SendDebug(__FUNCTION__, 'Wert ist 100%, fahre runter mit Down()');
+                 $this->Down();
+                 return;
+             }
+
+             // sonst: Zwischenpositionen berechnen
              if ($value < $middleMin) {
                  $this->SendDebug(__FUNCTION__, "Wert < middle_min ($middleMin), fahre ganz hoch (0%)");
                  $value = 0;
@@ -323,7 +335,27 @@ class xcomfortshutter extends IPSModule
          } else {
              $this->SendDebug(__FUNCTION__, 'TransmitterVariable not set!');
          }
+  /*           if ($value < $middleMin) {
+                 $this->SendDebug(__FUNCTION__, "Wert < middle_min ($middleMin), fahre ganz hoch (0%)");
+                 $value = 0;
+             } elseif ($value >= $middleMin && $value <= $middleMax) {
+                 $this->SendDebug(__FUNCTION__, "Wert im Bereich middle ($middleMin–$middleMax), setze auf $posMiddle%");
+                 $value = $posMiddle;
+             } elseif ($value >= $bottomMin && $value <= $bottomMax) {
+                 $this->SendDebug(__FUNCTION__, "Wert im Bereich bottom ($bottomMin–$bottomMax), setze auf $posBottom%");
+                 $value = $posBottom;
+             } elseif ($value > $bottomMax) {
+                 $this->SendDebug(__FUNCTION__, "Wert > bottom_max ($bottomMax), fahre ganz runter (100%)");
+                 $value = 100;
+             }
+
+             $this->SendDebug(__FUNCTION__, 'Mapped Position: ' . $value . '%');
+             $this->MoveShutter($value);
+         } else {
+             $this->SendDebug(__FUNCTION__, 'TransmitterVariable not set!');
+         }
      }
+     */
 
 
 
